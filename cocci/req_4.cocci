@@ -1,12 +1,10 @@
 //
-//  Detect semicolon after if
+// DESCRIPTION: A condition is directly followed by a ";" (without a statement).
 //
-// Target: Linux, Generic
-// Copyright:  2012 - LIP6/INRIA
 // License:  Licensed under ISC. See LICENSE or http://www.isc.org/software/license
-// Author: Peter Senna Tschudin <peter.senna@gmail.com>
+// Author: Julia Lawall <Julia.Lawall@lip6.fr>
 // URL: http://coccinelle.lip6.fr/ 
-// URL: http://coccinellery.org/ 
+// URL: http://coccinellery.org/
 
 @r1@
 position p;

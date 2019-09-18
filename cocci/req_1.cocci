@@ -1,21 +1,12 @@
 //
-//  Adjust confusing if/while/for indentation
+// DESCRIPTION: Possible confusing identations level after a if, for, while structure
+// without surrounding brackets containing only one statement.
 //
-// r: 
-//   if (cond)
-//     statement1
-//     statement2 
-//
-// r2:
-//   while (cond);
-//     statement
-//
-// Target: Linux
 // Copyright:  2012 - LIP6/INRIA
 // License:  Licensed under ISC. See LICENSE or http://www.isc.org/software/license
 // Author: Julia Lawall <Julia.Lawall@lip6.fr>
 // URL: http://coccinelle.lip6.fr/ 
-// URL: http://coccinellery.org/ 
+// URL: http://coccinellery.org/
 
 @r disable braces4@ // braces4 isomorphisme needs to be disabled.
 position p1,p2,p3;

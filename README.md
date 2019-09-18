@@ -15,9 +15,9 @@ $ ./check_code.sh <directory with C source code>
 ## Notes
 
 Each requirement checks one rule using a coccinelle script inside the cocci
-directory. The reqs.txt file describes each requirement.
+directory.
 
-Some cocinelle scripts come from the examples of the cocinelle project.
+Some scripts come from the examples of the cocinelle project.
 * req_1.cocci: [ifco.cocci](https://github.com/coccinelle/coccinellery/tree/master/ifcol/ifcol.cocci)
 * req_2.cocci: [dc.cocci](https://github.com/coccinelle/coccinellery/blob/master/double_call/dc.cocci)
 * req_3.cocci: [sz.cocci](https://github.com/coccinelle/coccinellery/blob/master/sz/sz.cocci)

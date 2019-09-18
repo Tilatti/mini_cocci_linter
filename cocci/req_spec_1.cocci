@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: Functions locking a mutex without unlocking at the end (ecos specific).
+//
+
 @ rule_ecos exists @
 expression E;
 expression RET1;

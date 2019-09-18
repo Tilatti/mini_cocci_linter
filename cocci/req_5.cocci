@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: Array indexed with a magic number (without using a const or a define) superior to 4.
+//
+
 @r1@
 identifier func;
 expression x;

@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: In a function returning a value, there is path without value returned.
+//
+
 @voidfunc@
 function FN;
 position voidpos;

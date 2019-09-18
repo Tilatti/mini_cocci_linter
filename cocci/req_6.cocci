@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: Variable is assigned in a condition.
+//
+
 @rule_if exists@
 statement S;
 expression E1;

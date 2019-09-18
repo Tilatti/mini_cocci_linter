@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: Non constant static variable. (global variable to module).
+//
+
 @rule_const@
 identifier I;
 type T;

@@ -1,3 +1,7 @@
+//
+// DESCRIPTION: Functions with more than 100 lines (blank line and comments NOT included).
+//
+
 @rnotfirst@
 statement S1;
 statement S2;

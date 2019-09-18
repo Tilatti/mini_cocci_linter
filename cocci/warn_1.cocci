@@ -1,13 +1,10 @@
 //
-//  Use unsigned for loop index
-// TODO: when i is used only in for loop
-//
-// Target: Linux, Generic
-// Copyright:  2012 - LIP6/INRIA
+// DESCRIPTION: Signed integer which can be declared as unsigned.
+// 
 // License:  Licensed under ISC. See LICENSE or http://www.isc.org/software/license
 // Author: Julia Lawall <Julia.Lawall@lip6.fr>
 // URL: http://coccinelle.lip6.fr/ 
-// URL: http://coccinellery.org/ 
+// URL: http://coccinellery.org/
 
 @r exists@ // find anything that might decrement the variable
 identifier i;
