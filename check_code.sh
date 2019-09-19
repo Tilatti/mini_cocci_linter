@@ -5,6 +5,7 @@ REQS_SPECIFIC="req_spec_1"
 WARNINGS="warn_1 warn_2 warn_4"
 
 SPATCH="spatch"
+CC="clang"
 
 function int_handler {
 	exit 1;
@@ -30,12 +31,14 @@ fi
 SRC_DIR=${@}
 CURR_DIR=$(dirname $0)
 COCCI_DIR="${CURR_DIR}/cocci"
+TEST_DIR="${CURR_DIR}/tests"
 
 # Read the description requirement inside the coccinelle script.
 # Print the description in the standard output.
 function read_description
 {
 	req=$1
+
 	in=false
 	description=""
 	while read line
@@ -63,27 +66,88 @@ function read_description
 function check_req
 {
 	req=$1
+
 	description=$(read_description ${req})
 	if [ "$description" == "" ]; then
-		description="Description for ${req} is missing !"
+		description="Description for $req is missing !"
 	fi
+
 	echo "check ${req}: ${description}"
 	for dir in ${SRC_DIR}; do
+		# Execute the script on the source files of the sub-directories
 		${SPATCH} --sp-file "${COCCI_DIR}/${req}.cocci" --dir "${dir}" --no-loops 2>/dev/null | \
 			sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\t\"\1\" at line \2/g"
 		if [ $? -ne 0 ]; then
-			echo "$result"
 			exit -1
 		fi
 	done
 }
 
+# Transform lines with number to a list of sorted number separated by blanks.
+function to_one_line
+{
+	sort -g | awk 'BEGIN {ls = ""} {if (ls == "") ls = $1; else ls = ls " " $1;} END {print ls}'
+}
+
+# Find the "not good" markers in a test source code.
+# Print the list of lines in the standard output.
+function find_not_good
+{
+	grep -n "not good" "$1" | cut -f1 -d: | to_one_line
+}
+
+function test_req
+{
+	req=$1
+
+	description=$(read_description ${req})
+	if [ "$description" == "" ]; then
+		description="Description for $req is missing !"
+	fi
+	echo "test ${req}: ${description}"
+
+	# Verify the test file exists
+	ls "${TEST_DIR}/${req}.c" > /dev/null 2>&1 
+	if [ $? -ne 0 ]; then
+		echo -e "\tTest file for $req is missing !";
+		return
+	fi
+
+	# Verify the test source code can be compiled
+	${CC} -w -c "${TEST_DIR}/${req}.c" -o - > /dev/null
+	if [ $? -ne 0 ]; then
+		echo -e "\tTest file for $req cannot be compiled !";
+		return
+	fi
+
+	# Find the lines with an error in the test file
+	expected_lines=$(find_not_good "${TEST_DIR}/${req}.c")
+
+	# Execute the script on the test file
+	found_lines=$(${SPATCH} --sp-file "${COCCI_DIR}/${req}.cocci" "${TEST_DIR}/${req}.c" --no-loops 2>/dev/null | \
+		sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\2/g" | to_one_line)
+	if [ $? -ne 0 ]; then
+		exit -1
+	fi
+
+	# Compare the script output with expected one
+	if [ "$expected_lines" != "$found_lines" ]; then
+		echo -e "\tError found in $req requirement."
+		echo -e "\t\tExpected error lines: $expected_lines"
+		echo -e "\t\tError lines: $found_lines"
+	fi
+}
+
+
 for req in ${REQS}; do
+	test_req ${req}
 	check_req ${req}
 done
 for req in ${REQS_SPECIFIC}; do
+	test_req ${req}
 	check_req ${req}
 done
 for req in ${WARNINGS}; do
+	test_req ${req}
 	check_req ${req}
 done

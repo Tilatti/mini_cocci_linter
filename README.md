@@ -1,5 +1,5 @@
-# check_code
-*check_code* is a small C linter using spatch program from the [coccinelle project](https://github.com/coccinelle/coccinelle).
+# mini_cocci_linter
+*mini_cocci_linter* is a small C linter using spatch program from the [coccinelle project](https://github.com/coccinelle/coccinelle).
 
 ## Usage
 
@@ -11,6 +11,7 @@ $ ./check_code.sh <directory with C source code>
 
 * bash
 * spatch
+* clang
 
 ## Notes
 
