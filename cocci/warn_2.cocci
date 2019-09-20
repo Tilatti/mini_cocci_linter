@@ -34,10 +34,10 @@ for (...;...;...) {
 p << r1.p;
 @@
 
-cocci.print_main("Useless continue ?: ", p)
+cocci.print_main("WARNING", p)
 
 @script:python@
 p << r2.p;
 @@
 
-cocci.print_main("Useless continue ?: ", p)
+cocci.print_main("WARNING", p)

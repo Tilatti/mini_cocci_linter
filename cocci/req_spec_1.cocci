@@ -29,7 +29,7 @@ return;
 p << rule_ecos_mutex.p;
 @@
 
-cocci.print_main("SPECIFIC ERROR", p)
+cocci.print_main("ERROR", p)
 
 // Mbedtls MD5 context
 
@@ -51,7 +51,7 @@ return;
 p << rule_mbedtls_md5_context.p;
 @@
 
-cocci.print_main("SPECIFIC ERROR", p)
+cocci.print_main("ERROR", p)
 
 // Mbedtls X509 Certificate context
 
@@ -73,4 +73,4 @@ return;
 p << rule_mbedtls_x509write_context.p;
 @@
 
-cocci.print_main("SPECIFIC ERROR", p)
+cocci.print_main("ERROR", p)

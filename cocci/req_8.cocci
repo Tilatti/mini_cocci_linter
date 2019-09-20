@@ -31,4 +31,4 @@ end_line = int(pend[0].line)
 
 if ((end_line - begin_line) > 200) and (func_line not in func_lines):
 	func_lines.append(func_line)
-	cocci.print_main("ERROR: More than 200 lines in this function.", pfunc)
+	cocci.print_main("ERROR", pfunc)

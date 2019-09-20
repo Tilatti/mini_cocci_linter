@@ -22,4 +22,4 @@ except:
 	pass
 else:
 	if index > 4:
-		cocci.print_main("ERROR: A number is directly used as index (maybe a define is relevant).", p)
+		cocci.print_main("ERROR", p)

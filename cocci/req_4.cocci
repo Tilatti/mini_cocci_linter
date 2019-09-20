@@ -14,4 +14,4 @@ if (...);@p
 @script:python@
 p0 << r1.p;
 @@
-cocci.print_main("ERROR: The if condition seems to be useless.", p0)
+cocci.print_main("ERROR", p0)

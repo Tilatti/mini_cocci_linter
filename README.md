@@ -4,7 +4,28 @@
 ## Usage
 
 ```console
-$ ./check_code.sh <directory with C source code>
+Usage:
+        Execute requirements on source code of a directory: ./check_code.sh [-r <requirement>] <directory>
+        Execute the test cases: ./check_code.sh -t [-r <requirement>]
+        Print this help: ./check_code.sh -h
+```
+
+Check all the requirements on the C source code files inside a directory (and its sub-directories).
+
+```console
+$ ./check_code.sh <directory>
+```
+
+Same as previously, but its check only the requirement *req_3*:
+
+```console
+$ ./check_code.sh -r req_3 <directory>
+```
+
+Execute the self-tests for all the requirements:
+
+```console
+$ ./check_code.sh -t
 ```
 
 ## Dependencies

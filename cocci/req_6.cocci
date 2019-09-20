@@ -15,7 +15,7 @@ if@p (<+... E1 = E ...+>) S
 p << rule_if.p;
 @@
 
-cocci.print_main("It is certainly a confusion between assignation and equal operator: ", p)
+cocci.print_main("ERROR", p)
 
 @rule_while exists@
 statement S;
@@ -30,4 +30,4 @@ while@p (<+... E1 = E ...+>) S
 p << rule_while.p;
 @@
 
-cocci.print_main("ERROR: It is certainly a confusion between assignation and equal operator.", p)
+cocci.print_main("ERROR", p)

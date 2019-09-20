@@ -40,10 +40,10 @@ p3 << r.p3;
 indent_level = 2
 if (int(p1[0].line) != int(p3[0].line)):
 	if int(p1[0].column) != (int(p2[0].column) + indent_level):
-		cocci.print_main("Bad indentation ?: ", p1)
+		cocci.print_main("ERROR", p1)
 else:
 	if int(p3[0].column) != int(p2[0].column):
-		cocci.print_main("Bad indentation ?: ", p1)
+		cocci.print_main("ERROR", p1)
 
 @r2 disable braces4@ // braces4 isomorphisme needs to be disabled.
 position p1,p2;
@@ -63,4 +63,4 @@ p2 << r2.p2;
 
 indent_level = 2
 if (int(p1[0].line) != int(p2[0].line)) and (int(p1[0].column) != int(p2[0].column)):
-	cocci.print_main("ERROR: Bad indentation ?: " + str(p1[0].line) +  ", " + str(p2[0].line), p1)
+	cocci.print_main("ERROR", p1)

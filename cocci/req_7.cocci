@@ -25,4 +25,4 @@ T FN@pos(...) {
 p << func.pos;
 @@
 
-cocci.print_main("ERROR: This function has a return value type in prototype, but a path without return.", p)
+cocci.print_main("ERROR", p)

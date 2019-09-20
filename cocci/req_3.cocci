@@ -17,4 +17,4 @@ sizeof(E)@p
 pbad << r.p;
 @@
 
-cocci.print_main("ERROR: sizeof(pointer) is suspicious.", pbad)
+cocci.print_main("ERROR", pbad)

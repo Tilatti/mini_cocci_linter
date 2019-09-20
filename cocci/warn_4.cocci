@@ -28,4 +28,4 @@ static T I;@p
 p << rule.p;
 @@
 
-cocci.print_main("WARNING: Non const static variable", p)
+cocci.print_main("WARNING", p)

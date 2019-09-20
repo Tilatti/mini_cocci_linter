@@ -53,4 +53,4 @@ position p1 != r.p;
 p1 << x.p1;
 @@
 
-cocci.print_main("Should be an unsigned integer ?:", p1)
+cocci.print_main("WARNING", p1)
