@@ -9,6 +9,13 @@ function int_handler {
 }
 trap int_handler SIGINT SIGTERM SIGKILL SIGABRT SIGQUIT
 
+SPATCH="/usr/bin/env spatch"
+CC="/usr/bin/env clang"
+
+CURR_DIR=$(dirname $0)
+COCCI_DIR="${CURR_DIR}/cocci"
+TEST_DIR="${CURR_DIR}/tests"
+
 function print_usage {
 	echo -e "Usage:"
 	echo -e "\tExecute requirements on source code of a directory: ${0} [-r <requirement>] <directory>"
@@ -18,7 +25,7 @@ function print_usage {
 
 # Parse the options
 opt_tests=false
-opt_reqs="all"
+opt_reqs=$(find ${CURR_DIR}/cocci -name "*.cocci" -type f -printf "%f\n"  | cut -d. -f1)
 while getopts "htr:" opt; do
 	case "$opt" in
 		h)
@@ -45,14 +52,6 @@ else
 	fi
 	directories=$@
 fi
-
-SPATCH="/usr/bin/env spatch"
-CC="/usr/bin/env clang"
-
-SRC_DIR=${@}
-CURR_DIR=$(dirname $0)
-COCCI_DIR="${CURR_DIR}/cocci"
-TEST_DIR="${CURR_DIR}/tests"
 
 # Read the description requirement inside the coccinelle script.
 # Print the description in the standard output.
@@ -93,12 +92,13 @@ function print_description_and_status
 	fi
 
 	# Print the description with the status
+	echo -en "check ${req}: ${description} "
 	if [ $status == "OK" ]; then
-		echo -e "check ${req}: ${description} [\e[32mOK\e[0m]"
+		echo -e "[\e[32mOK\e[0m]"
 	elif [ $status == "NOK" ]; then
-		echo -e "check ${req}: ${description} [\e[31mNOK\e[0m]"
+		echo -e "[\e[31mNOK\e[0m]"
 	else
-		echo -e "check ${req}: ${description} [\e[1;33mUNKNOWN\e[0m]"
+		echo -e "[\e[1;33mUNKNOWN\e[0m]"
 	fi
 }
 
@@ -113,6 +113,21 @@ function to_one_line
 function find_not_good
 {
 	grep -n "not good" "$1" | cut -f1 -d: | to_one_line
+}
+
+SPATCH_LOG="${CURR_DIR}/spatch.log"
+SPATCH_RESULT="${CURR_DIR}/spatch.res"
+
+# Execute the spatch command on a directory or a source file. Store the result inside log files.
+function spatch_and_log
+{
+	if [ -f ${2} ]; then
+		${SPATCH} --sp-file "${1}" --dir "${2}" --no-loops 2>>${SPATCH_LOG} | tee -a ${SPATCH_RESULT}
+	elif [ -d ${2} ]; then
+		${SPATCH} --sp-file "${1}" "${2}" --no-loops 2>>${SPATCH_LOG} | tee -a ${SPATCH_RESULT}
+	else
+		echo "\tUnable to execute the spatch on ${2}."
+	fi
 }
 
 # Execute the coccinelle script corresponding to the requirement given in argument.
@@ -132,20 +147,21 @@ function check_req
 	has_error=false
 	for dir in $directories; do
 		# Execute the script on the source files of the sub-directories
-		log=$(${SPATCH} --sp-file "${COCCI_DIR}/${req}.cocci" --dir "${dir}" --no-loops 2>/dev/null)
+		result=$(spatch_and_log "${COCCI_DIR}/${req}.cocci" "${dir}")
 		if [ $? -ne 0 ]; then
-			echo -e "\tFail to execute the script file ${req}"
+			echo -e "\tFail to execute the script file ${req}:"
+			echo -e "\tSee ${SPATCH_LOG} for more information."
 			return 1;
 		fi
 
 		# Count the number of errors detected by the script
-		error_count=$(echo -e "$log" | grep -c "\(WARNING\|ERROR\)")
+		error_count=$(echo -e $result | grep -c "\(WARNING\|ERROR\)")
 		if [ $error_count -gt 0 ]; then
 			has_error=true
 		fi
 
 		# Print the detected error locations
-		echo -e "$log" | sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\t\"\1\" at line \2/g"
+		echo -e "$result" | sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\t\"\1\" at line \2/g"
 	done
 
 	if $has_error; then
@@ -185,10 +201,11 @@ function test_req
 	expected_lines=$(find_not_good "${TEST_DIR}/${req}.c")
 
 	# Execute the script on the test file
-	found_lines=$(${SPATCH} --sp-file "${COCCI_DIR}/${req}.cocci" "${TEST_DIR}/${req}.c" --no-loops 2>/dev/null | \
-		sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\2/g" | to_one_line)
+	found_lines=$(spatch_and_log "${COCCI_DIR}/${req}.cocci" "${TEST_DIR}/${req}.c" \
+		| sed "s/.* \([^ ]*.c\)::\([0-9][0-9]*\)]]/\2/g" | to_one_line)
 	if [ $? -ne 0 ]; then
-		echo -e "\tSpatch execution failed !";
+		echo -e "\tFail to execute the script file ${req}:"
+		echo -e "\tSee ${SPATCH_LOG} for more information."
 		return 1;
 	fi
 
@@ -203,14 +220,10 @@ function test_req
 	return 0;
 }
 
-declare -a ALL_REQS=("req_1" "req_2" "req_3" "req_4" "req_5" "req_6" "req_7" "req_8" "req_spec_1" "warn_1" "warn_2" "warn_4")
+if [ -f ${SPATCH_LOG} ]; then rm ${SPATCH_LOG}; fi
+if [ -f ${SPATCH_RESULT} ]; then rm ${SPATCH_RESULT}; fi
 
-if [ $opt_reqs == "all" ]; then
-	reqs=${ALL_REQS[@]}
-else
-	reqs=($opt_reqs)
-fi
-for req in ${reqs[@]}; do
+for req in ${opt_reqs}; do
 	if $opt_tests; then
 		output=$(test_req "$req")
 	else
