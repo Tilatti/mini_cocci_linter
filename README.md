@@ -47,6 +47,71 @@ Some scripts come from the examples of the cocinelle project.
 * warn_1.cocci: [signed.cocci](https://github.com/coccinelle/coccinellery/blob/master/signed/signed.cocci)
 * warn_2.cocci: [cont.cocci](https://github.com/coccinelle/coccinellery/blob/master/drop_continue/cont.cocci)
 
+You can implement our own requirement. For example, if we want to detect when
+the goto jumps to a label preceding this goto, we will add the following file
+*cocci/goto_req.cocci* :
+
+```
+//
+// DESCRIPTION: Detect use of backward goto.
+//
+
+@r@
+position p;
+identifier label;
+@@
+
+label:
+...
+goto label;@p
+
+@script:python@
+p << r.p;
+@@
+cocci.print_main("ERROR", p)
+```
+
+To check the requirement on a directory containing C files:
+
+```console
+$ ./check_code.sh -r goto_req.cocci /home/foo/src
+```
+
+We will also add a test in order to verify if the requirement do what we
+expect. Add the file *cocci/goto_req.c*:
+
+```
+void t1(void)
+{
+  goto F;
+F:
+  return;
+}
+
+void t2(void)
+{
+  goto F;
+  while(0);
+F:
+  return;
+}
+
+void t3(void)
+{
+F:
+  while(0);
+  goto F; /* not good */
+  return;
+}
+```
+
+Note that the place where the requirement shall detect an error is marked with
+the comment ```/* not good */```. Now we can execute the test case:
+
+```console
+$ ./check_code.sh -t -r goto_req.cocci
+```
+
 ## Bugs
 
 * Is the cocci/req_2.cocci broken ?
